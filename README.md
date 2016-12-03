@@ -1,2 +1,2 @@
-A website for language excersises. 
+A web-unterface for language excersises. 
 
