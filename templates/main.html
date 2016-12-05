@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html>
+  
+  <head>
+    <title>users_page</title>
+    <meta name="viewport" content="width=device-width">
+    <!-- <link rel="stylesheet" href="/static/bootstrap.min.css"> -->
+
+  </head>
+  
+  <body>
+    <div class="container">
+    <h3 class="header">Welcome to our language tests!<a href="/acad/accounts/logout/" class="btn pull-right btn-link">Log out</a></h3>
+    <div class="container-fluid">
+        <h4>Choose language</h4>
+
+
+    <form method="post">
+    <input type='hidden' name='csrfmiddlewaretoken' value='TAbjL0DOZhX1czCTuabXCZKwMfEBv5v0' /> 
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>
+            <select class="form-control" name="language">
+              <option value=0>not chosen</option>
+              <option value=1>Russian</option>
+              <option value=2>English</option>
+              <option value=3>Italian</option>
+              <option value=4>Polish</option>
+            </select>
+          </td>
+          <td>
+<!--             <select class="form-control" name="task">
+                
+              <option value=6>Task 1</option>
+                
+              <option value=18>Task 2</option>
+                
+            </select> -->
+          </td>
+          <td>
+            <button class="btn btn-success" type="submit" name="action" value="start">Start</button>
+          </td>
+        <td>
+       <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button>
+        </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+
+    </form>
+          <h4>Results</h4>
+     <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Test</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+      
+      </tbody>
+    </table>
+  </div>
+  </body>
+
+</html>
