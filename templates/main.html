@@ -3,15 +3,19 @@
 <html>
   
   <head>
-    <title>users_page</title>
+    <title>language trainers</title>
     <meta name="viewport" content="width=device-width">
-    <!-- <link rel="stylesheet" href="/static/bootstrap.min.css"> -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}" >
 
   </head>
   
   <body>
     <div class="container">
-    <h3 class="header">Welcome to our language tests!<a href="/acad/accounts/logout/" class="btn pull-right btn-link">Log out</a></h3>
+    <h3 class="header">
+      Welcome to our language tests!
+      <a href="/register/" class="btn pull-right btn-link">Register</a>
+      <a href="/register/" class="btn pull-right btn-link">Log in</a>
+    </h3>
     <div class="container-fluid">
         <h4>Choose language</h4>
 
@@ -22,31 +26,50 @@
       <tbody>
         <tr>
           <td>
-            <select class="form-control" name="language">
-              <option value=0>not chosen</option>
-              <option value=1>Russian</option>
-              <option value=2>English</option>
-              <option value=3>Italian</option>
-              <option value=4>Polish</option>
-            </select>
+            {% if chosen != True %}
+              <select class="form-control" name="language">
+                <option value='not chosen'>please choose a language to train</option>
+                <option value=Russian>Russian</option>
+                <option value=English>English</option>
+                <option value=Italian>Italian</option>
+                <option value=Polish>Polish</option>
+              </select>
+            {% else %}
+              <select class="form-control" name="language">
+                <option value=Russian>Russian</option>
+                <option value=English>English</option>
+                <option value=Italian>Italian</option>
+                <option value=Polish>Polish</option>
+              </select>
+            {% endif %}
+            </td>
+            <td>
+            <button class="btn btn-success" type="submit" name="action" value="select">Select</button>
+            </td>              
+          </tr>
+          <tr> 
+          <td>
+            {% if chosen == True %}
+            <h4>Choose the topic</h4>
+              <select class="form-control" name="task">
+                {% for task in tasks %}
+                  <option value={{task}}>{{task}}</option>
+                {% endfor %}
+              </select>
+            {% endif %}
+            </td>
+          <td>
+            <br/>
+            <br/>
+            <button class="btn btn-success" type="submit" name="action" value="start">Select</button>
           </td>
           <td>
-<!--             <select class="form-control" name="task">
-                
-              <option value=6>Task 1</option>
-                
-              <option value=18>Task 2</option>
-                
-            </select> -->
-          </td>
-          <td>
-            <button class="btn btn-success" type="submit" name="action" value="start">Start</button>
           </td>
         <td>
-       <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button>
+       <!-- <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button> -->
         </td>
-
         </tr>
+          
 
       </tbody>
 
@@ -54,19 +77,6 @@
 
 
     </form>
-          <h4>Results</h4>
-     <table class="table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Test</th>
-          <th>Score</th>
-        </tr>
-      </thead>
-      <tbody>
-      
-      </tbody>
-    </table>
   </div>
   </body>
 
