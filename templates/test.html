@@ -1,0 +1,56 @@
+<!doctype html>
+
+<html>
+  
+  <head>
+    <title>language trainers</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}" >
+
+  </head>
+  
+  <body>
+    <div class="container">
+    <h3 class="header">
+      Fill in form and press "Done!"
+      <a href="/register/" class="btn pull-right btn-link">Register</a>
+      <a href="/register/" class="btn pull-right btn-link">Log in</a>
+    </h3>
+    <div class="container-fluid">
+        <h4></h4>
+
+
+      <tbody>
+        <tr>
+          <td>
+            </td>
+            <td>
+            </td>              
+          </tr>
+          <tr> 
+          <td>
+            <h4>{{test_name}}</h4>
+            </td>
+          <td>
+            <br/>
+            <br/>
+          </td>
+          <td>
+          </td>
+        <td>
+       <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button>
+        </td>
+        </tr>
+        <button class="btn btn-success" type="submit" name="action" value="start">Done!</button>
+          
+
+      </tbody>
+
+    </table>
+
+
+    </form>
+  </div>
+  </body>
+
+</html>
