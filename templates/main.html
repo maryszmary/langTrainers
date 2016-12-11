@@ -47,16 +47,15 @@
             <button class="btn btn-success" type="submit" name="action" value="select">Select</button>
             </td>              
           </tr>
+            {% if chosen == True %}
           <tr> 
           <td>
-            {% if chosen == True %}
             <h4>Choose the topic</h4>
               <select class="form-control" name="task">
                 {% for task in tasks %}
                   <option value={{task}}>{{task}}</option>
                 {% endfor %}
               </select>
-            {% endif %}
             </td>
           <td>
             <br/>
@@ -65,6 +64,7 @@
           </td>
           <td>
           </td>
+            {% endif %}
         <td>
        <!-- <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button> -->
         </td>
