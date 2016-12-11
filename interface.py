@@ -21,8 +21,18 @@ class TasksDB():
         db.close()
         return results   
 
-    def get_task(self, lang, name):
-        pass  
+    def get_task(self, lang, name, num):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT test, answers, info FROM tests WHERE language = ? {AND}'
+                     'ID = ? {AND} topic = ?', (lang, num, name))
+        results = cur.fetchall()
+        db.close()
+        return results
+
+
+def count_score():
+    pass
 
 
 db = TasksDB('tasks.db')
@@ -36,15 +46,23 @@ def main_guest():
            and request.form['language'] != 'not chosen'\
            and 'task' not in request.form:
             lang = request.form['language']
+            global lang
             test_data = db.get_tests(lang)
             tests = [str(line[0] + 1) + '. ' + line[4] for line in test_data]
             return render_template('main.html', chosen = True, 
                                    lang = lang, tasks = tests)
         elif 'task' in request.form:
-            task_name = request.form['task']
-            task_id = int(task_name.strip('.'))
-            return render_template('test.html', test_name = task_name)
+            tname = request.form['task']
+            num = int(tname.split('. ')[0]) - 1
+            topic = tname.split('. ')[1]
+            test = db.get_task(lang, name, num)
+            return render_template('test.html', tname = tname, lang = lang)
     return render_template('main.html')
+
+
+@app.route('/langtests/task')
+def task():
+    pass
 
 
 @app.route('/langtests/loggedin')
