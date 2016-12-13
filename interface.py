@@ -5,6 +5,16 @@ from flask import render_template
 from flask import request
 import sqlite3
 
+# idunno what's it for but well...
+# import pkgutil
+# orig_get_loader = pkgutil.get_loader
+# def get_loader(name):
+#     try:
+#         return orig_get_loader(name)
+#     except AttributeError:
+#         pass
+# pkgutil.get_loader = get_loade
+
 
 class TasksDB():
     '''the db fith tests and users'''
@@ -29,29 +39,53 @@ class TasksDB():
         db.close()
         return results
 
+    def get_answers(self, num):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT answers FROM tests WHERE ID = ?', (num, ))
+        results = cur.fetchall()[0][0].split('\n')
+        db.close()
+        return results
 
-def count_score():
-    pass
+
+def count_score(form, num):
+    results = []
+    correct_ans = db.get_answers(num)
+    correct_ans = {el[0] : el[1] for el in enumerate(correct_ans)}
+    form = {int(key) : form[key] for key in form if key != 'action'}
+    for key in form:
+        results.append([key, form[key] == correct_ans[key],
+                       form[key], correct_ans[key]])
+    results = sorted(results, key = lambda x: x)
+    score = sum([el[1] for el in results])
+    results = [[line[0]] + [str(line[1])] + line[2:] for line in results]
+    # with open('/tmp/try', 'w') as f:
+    #     for key in form:
+    #         if key != 'action':
+    #             f.write(key + ' : ' + form[key] + '\n')
+    return results, score
 
 
 def process_task_req(tname):
     num = int(tname.split('. ')[0]) - 1
     topic = tname.split('. ')[1]
     test = db.get_task(topic, num)
-    text, answers, info = test[0]
+    text, answers, info = test[0]    
     text = text.split('\n')
     if '' in text:
-	    text.remove('')
+        text.remove('')
     task = text[0]
     text = text[1:]
-    return task, text
+    text = [[str(i)] + text[i].split('[answer]') for i in range(len(text))]
+    answers = answers.split('\n')
+    return task, text, info, answers
 
 
 db = TasksDB('tasks.db')
 app = Flask(__name__, static_folder=u"./static")
 
 
-@app.route('/langtests/guest', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def main_guest():
     if request.form:
         if 'language' in request.form\
@@ -64,24 +98,15 @@ def main_guest():
                                    tasks = tests)
         elif 'task' in request.form:
             tname = request.form['task']
-            # num = int(tname.split('. ')[0]) - 1
-            # topic = tname.split('. ')[1]
-            # test = db.get_task(topic, num)
-            # text, answers, info = test[0]
-            task, text = process_task_req(tname)
-            return render_template('test.html', tname = tname,
-            	                   test = text, task = task)
+            task, text, info, answers = process_task_req(tname)
+            return render_template('test.html', tname = tname, test = text,
+                                   task = task, info = info)
+        elif 'action' in request.form:
+            results, score = count_score(request.form, '0')
+            return render_template('results.html', results = results,
+                                   score = score)
     return render_template('main.html')
 
 
-@app.route('/langtests/Russian')
-def task():
-    pass
-
-
-@app.route('/langtests/loggedin')
-def main_loggedin():
-    return render_template('main_logged_in.html')
-
-
-app.run(debug = True)  
+if __name__ == '__main__':
+    app.run(debug = True)  

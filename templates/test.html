@@ -6,7 +6,8 @@
     <title>language trainers</title>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}" >
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
   
   <body>
@@ -14,9 +15,9 @@
     <h3 class="header">
       <!-- {{lang}}.  -->
       Test {{tname}}.
-      <a href="/register/" class="btn pull-right btn-link">Register</a>
+<!--       <a href="/register/" class="btn pull-right btn-link">Register</a>
       <a href="/register/" class="btn pull-right btn-link">Log in</a>
-      <br/>
+ -->      <br/>
       <br/>
     </h3>
     <div class="container-fluid">
@@ -33,7 +34,16 @@
           <tr> 
           <td>
             <h4>Fill in the form and press "Done!"
-             <button class="btn pull-right btn-success" type="submit" name="action" value="theory">Show theory for this task</button></h4>
+             <!-- <button class="btn pull-right btn-success" type="submit" name="action" value="theory">Show theory for this task</button></h4> -->
+             <div class="btn pull-right btn-link">
+              <a href="#" data-toggle="popover" title="{{tname}}" data-content="{{info}}">Show theory for this task</a>
+            </div></h4>
+
+            <script>
+            $(document).ready(function(){
+                $('[data-toggle="popover"]').popover();   
+            });
+            </script>
             <br/>
             <br/>
             </td>
@@ -41,8 +51,15 @@
           </td>
           <b>{{task}}</b>
           <td>
+          <br>
+          <br>
+        <form method="post">
+         <span>
           {% for sent in test %}
-          {{sent}}<br>
+          {{sent[1]}}        
+           <input type="text" name="{{sent[0]}}">
+          {{sent[2]}} 
+          <br>
           {% endfor %}
           <br/>
           </td>
@@ -51,7 +68,9 @@
         <td>
         </td>
         </tr>
-        <button class="btn btn-success" type="submit" name="action" value="start">Done!</button>
+        <button class="btn btn-success" type="submit" name="action" value="done">Done!</button>
+        </span>
+        </form>
           
 
       </tbody>
