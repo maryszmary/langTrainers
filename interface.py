@@ -54,15 +54,11 @@ def count_score(form, num):
     correct_ans = {el[0] : el[1] for el in enumerate(correct_ans)}
     form = {int(key) : form[key] for key in form if key != 'action'}
     for key in form:
-        results.append([key, form[key] == correct_ans[key],
+        results.append([key, form[key].strip() == correct_ans[key].strip(),
                        form[key], correct_ans[key]])
     results = sorted(results, key = lambda x: x)
     score = sum([el[1] for el in results])
-    results = [[line[0]] + [str(line[1])] + line[2:] for line in results]
-    # with open('/tmp/try', 'w') as f:
-    #     for key in form:
-    #         if key != 'action':
-    #             f.write(key + ' : ' + form[key] + '\n')
+    results = [[line[0]] + [line[1]] + line[2:] for line in results]
     return results, score
 
 
