@@ -58,8 +58,9 @@ def count_score(form, num):
                        form[key], correct_ans[key]])
     results = sorted(results, key = lambda x: x)
     score = sum([el[1] for el in results])
+    total = len(results)
     results = [[line[0]] + [line[1]] + line[2:] for line in results]
-    return results, score
+    return results, score, total
 
 
 def process_task_req(tname):
@@ -98,7 +99,7 @@ def main_guest():
             return render_template('test.html', tname = tname, test = text,
                                    task = task, info = info)
         elif 'action' in request.form:
-            results, score = count_score(request.form, '0')
+            results, score, total = count_score(request.form, '0')
             return render_template('results.html', results = results,
                                    score = score)
     return render_template('main.html')
