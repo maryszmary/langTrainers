@@ -3,6 +3,9 @@ import re
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import redirect
+from flask import session
+from flask import url_for
 import sqlite3
 
 # idunno what's it for but well...
@@ -94,15 +97,20 @@ def main_guest():
             return render_template('main.html', chosen = True, 
                                    tasks = tests)
         elif 'task' in request.form:
-            tname = request.form['task']
-            task, text, info, answers = process_task_req(tname)
-            return render_template('test.html', tname = tname, test = text,
-                                   task = task, info = info)
+        	return redirect(url_for('testing'))
         elif 'action' in request.form:
             results, score, total = count_score(request.form, '0')
             return render_template('results.html', results = results,
                                    score = score)
     return render_template('main.html')
+
+
+@app.route('/testing', methods=['GET', 'POST'])
+def testing():
+    tname = request.form['task']
+    task, text, info, answers = process_task_req(tname)
+    return render_template('test.html', tname = tname, test = text,
+                           task = task, info = info)
 
 
 if __name__ == '__main__':
