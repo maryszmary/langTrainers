@@ -13,9 +13,9 @@
     <h3 class="header">
       <!-- {{lang}}.  -->
       Here are your results!
-<!--       <a href="/register/" class="btn pull-right btn-link">Register</a>
-      <a href="/register/" class="btn pull-right btn-link">Log in</a>
- -->      <br/>
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Register</a>
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Log in</a>
+      <br/>
       <br/>
     </h3>
     <div class="container-fluid">
@@ -53,6 +53,10 @@
       </tbody>
 
     </table>
+    <br>
+    <br>
+    <br>
+    <a href="{{ url_for('main_guest') }}" class="btn btn-success">Return to the main page</a>
 
 
     </form>

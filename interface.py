@@ -16,7 +16,7 @@ import sqlite3
 #         return orig_get_loader(name)
 #     except AttributeError:
 #         pass
-# pkgutil.get_loader = get_loade
+# pkgutil.get_loader = get_loader
 # end of The Piece of Code I Don't Understand
 
 
@@ -43,23 +43,24 @@ class TasksDB():
         db.close()
         return results
 
-    def get_answers(self, num):
+    def get_answers(self, tname):
         db = sqlite3.connect(self.name)
         cur = db.cursor()
-        cur.execute('SELECT answers FROM tests WHERE ID = ?', (num, ))
+        cur.execute('SELECT answers FROM tests WHERE topic = ?', (tname, ))
         results = cur.fetchall()[0][0].split('\n')
+        results = {el[0] : el[1].split('|') for el in enumerate(results)}
+        results = {key : [i.strip() for i in results[key]] for key in results}
         db.close()
         return results
 
 
-def count_score(form, num):
+def count_score(form):
     results = []
-    correct_ans = db.get_answers(num)
-    correct_ans = {el[0] : el[1] for el in enumerate(correct_ans)}
-    form = {int(key) : form[key] for key in form if key != 'action'}
+    correct_ans = db.get_answers(session['task'])
+    form = {int(key) : form[key].lower().replace('ё', 'е') for key in form}
     for key in form:
-        results.append([key, form[key].strip() == correct_ans[key].strip(),
-                       form[key], correct_ans[key]])
+        results.append([key, form[key].strip() in correct_ans[key],
+                       form[key], ' | '.join(correct_ans[key])])
     results = sorted(results, key = lambda x: x)
     score = sum([el[1] for el in results])
     total = len(results)
@@ -107,16 +108,20 @@ def main_guest():
 def testing():
     tname = session['task']
     task, text, info, answers = process_task_req(tname)
-    if 'done' in session:
+    if 'done' in request.form:
+        for el in request.form:
+            session[el] = request.form[el]
         return redirect(url_for('results'))
     return render_template('test.html', tname = tname, test = text,
                            task = task, info = info)
-    return render_template('not_ready.html')
 
 
 @app.route('/results', methods=['GET', 'POST'])
 def results():
-    results, score, total = count_score(session, '0')
+    not_sents = ['action', 'language', 'task',  'csrfmiddlewaretoken',
+                 'lang', 'done']
+    form = {el : session[el] for el in session if el not in not_sents}
+    results, score, total = count_score(form)
     return render_template('results.html', results = results,
                            score = score)
 
