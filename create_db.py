@@ -46,7 +46,7 @@ def get_data(fname, lang):
 
 
 def task_parser(text):
-    task = text.split('\n', 1)[0]
+    task = text.split('\n', 1)[0] + '\n'
     answers = ''
     for line in text.split('\n')[1:]:
         if not line.startswith('%') and line != '':

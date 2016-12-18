@@ -8,7 +8,7 @@ from flask import session
 from flask import url_for
 import sqlite3
 
-# idunno what's it for but well...
+# idunno what's it for but well... (I added this following https://bitbucket.org/dendik/webdev/wiki/wsgi3tutorial)
 # import pkgutil
 # orig_get_loader = pkgutil.get_loader
 # def get_loader(name):
@@ -17,6 +17,7 @@ import sqlite3
 #     except AttributeError:
 #         pass
 # pkgutil.get_loader = get_loade
+# end of The Piece of Code I Don't Understand
 
 
 class TasksDB():
@@ -33,11 +34,11 @@ class TasksDB():
         db.close()
         return results
 
-    def get_task(self, topic, num):
+    def get_task(self, topic):
         db = sqlite3.connect(self.name)
         cur = db.cursor()
-        cur.execute('SELECT test, answers, info FROM tests WHERE'
-                     ' ID = ? AND topic = ?', (num, topic))
+        cur.execute('SELECT task, answers, info FROM tests WHERE'
+                     ' topic = ?', (topic, ))
         results = cur.fetchall()
         db.close()
         return results
@@ -67,9 +68,7 @@ def count_score(form, num):
 
 
 def process_task_req(tname):
-    num = int(tname.split('. ')[0]) - 1
-    topic = tname.split('. ')[1]
-    test = db.get_task(topic, num)
+    test = db.get_task(tname)
     text, answers, info = test[0]    
     text = text.split('\n')
     if '' in text:
@@ -92,26 +91,41 @@ def main_guest():
            and request.form['language'] != 'not chosen'\
            and 'task' not in request.form:
             lang = request.form['language']
+            session['lang'] = lang
             test_data = db.get_tests(lang)
-            tests = [str(line[0] + 1) + '. ' + line[4] for line in test_data]
+            tests = [line[1] for line in test_data]
             return render_template('main.html', chosen = True, 
                                    tasks = tests)
         elif 'task' in request.form:
-        	return redirect(url_for('testing'))
-        elif 'action' in request.form:
-            results, score, total = count_score(request.form, '0')
-            return render_template('results.html', results = results,
-                                   score = score)
+            for el in request.form:
+                session[el] = request.form[el]
+            return redirect(url_for('testing'))
     return render_template('main.html')
 
 
 @app.route('/testing', methods=['GET', 'POST'])
 def testing():
-    tname = request.form['task']
+    tname = session['task']
     task, text, info, answers = process_task_req(tname)
+    if 'done' in session:
+        return redirect(url_for('results'))
     return render_template('test.html', tname = tname, test = text,
                            task = task, info = info)
+    return render_template('not_ready.html')
+
+
+@app.route('/results', methods=['GET', 'POST'])
+def results():
+    results, score, total = count_score(session, '0')
+    return render_template('results.html', results = results,
+                           score = score)
+
+
+@app.route('/not_ready', methods=['GET', 'POST'])
+def not_ready():
+    return render_template('not_ready.html')
 
 
 if __name__ == '__main__':
-    app.run(debug = True)  
+    app.secret_key = 'toshcpri]7f2ba023b824h6[hs87nja5enact'
+    app.run(debug = True, port = 5312)

@@ -13,8 +13,8 @@
     <div class="container">
     <h3 class="header">
       Welcome to our language tests!
-      <a href="/register/" class="btn pull-right btn-link">Register</a>
-      <a href="/register/" class="btn pull-right btn-link">Log in</a>
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Register</a>
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Log in</a>
       <br/>
       <br/>
     </h3>
@@ -33,15 +33,15 @@
                 <option value='not chosen'>please choose a language to train</option>
                 <option value=Russian>Russian</option>
                 <option value=English>English</option>
-                <option value=Italian>Italian</option>
-                <option value=Polish>Polish</option>
+<!--                 <option value=Italian>Italian</option>
+                <option value=Polish>Polish</option> -->
               </select>
             {% else %}
               <select class="form-control" name="language">
                 <option value=Russian>Russian</option>
                 <option value=English>English</option>
-                <option value=Italian>Italian</option>
-                <option value=Polish>Polish</option>
+<!--                 <option value=Italian>Italian</option>
+                <option value=Polish>Polish</option> -->
               </select>
             {% endif %}
             </td>
@@ -68,7 +68,6 @@
           </td>
             {% endif %}
         <td>
-       <!-- <button class="btn pull-right btn-link" type="submit" name="action" value="theory">Show theory</button> -->
         </td>
         </tr>
           
