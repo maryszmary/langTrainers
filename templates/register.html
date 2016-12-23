@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html>
+  
+  <head>
+    <title>language trainers</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="container">
+    <h3 class="header">
+      <!-- {{lang}}.  -->
+      Test {{tname}}.
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Register</a>
+      <a href="{{ url_for('not_ready') }}" class="btn pull-right btn-link">Log in</a>
+      <br/>
+      <br/>
+    </h3>
+    <div class="container-fluid">
+        <h4></h4>
+
+
+      <tbody>
+        <tr>
+          <td>
+            </td>
+            <td>
+            </td>              
+          </tr>
+          <tr> 
+          <td>
+            <h4>Pick a username and a password and press "Register"!</h4>
+            <br/>
+            <br/>
+            </td>
+          <td>
+          </td>
+          <td>
+          <br>
+          <br>
+        <form method="post">
+         <span>
+          <b>username</b>
+           <input type="text" name="Login">
+          <b>password</b>
+           <input type="text" name="password">
+          <br>
+          <br/>
+          </td>
+          </tr>
+          <tr>
+        <td>
+        </td>
+        </tr>
+        <button class="btn btn-success" type="submit" name="done" value="submit">Register!</button>
+        </span>
+        </form>
+          
+
+      </tbody>
+
+    </table>
+
+
+    </form>
+  </div>
+  </body>
+
+</html>
