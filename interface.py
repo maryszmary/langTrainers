@@ -81,6 +81,15 @@ def process_task_req(tname):
     return task, text, info, answers
 
 
+def check_username():
+    pass
+
+
+def add_user():
+    pass
+    
+
+
 db = TasksDB('tasks.db')
 app = Flask(__name__, static_folder=u"./static")
 
@@ -129,6 +138,18 @@ def results():
 @app.route('/not_ready', methods=['GET', 'POST'])
 def not_ready():
     return render_template('not_ready.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.form and 'login' in request.form\
+       and 'password' in request.form:
+       if not check_username(request.form['login']):
+          return render_template('already_taken.html')
+       else:
+          add_user(request.form['login'], request.form['password'])
+          redirect(main_guest) # исправить
+       
 
 
 if __name__ == '__main__':
