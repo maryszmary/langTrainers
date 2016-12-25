@@ -7,6 +7,7 @@ from flask import redirect
 from flask import session
 from flask import url_for
 import sqlite3
+import time
 
 # idunno what's it for but well... (I added this following https://bitbucket.org/dendik/webdev/wiki/wsgi3tutorial)
 # import pkgutil
@@ -53,6 +54,62 @@ class TasksDB():
         db.close()
         return results
 
+    def username_exists(self, username):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT username FROM users WHERE username = ?',
+                    (username, ))
+        results = cur.fetchall()
+        db.close()
+        return len(results) > 0
+
+
+    def add_user(self, username, password):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT ID FROM users')
+        ids = [line[0] for line in cur.fetchall()]
+        if ids:
+            new_id = max(ids) + 1
+        else:
+            new_id = 0
+        cur.execute('INSERT INTO users VALUES (?, ?, ?, NULL)',
+                    (new_id, username, password))
+        db.commit()
+        db.close()
+
+
+    def check_password(self, username, password):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT password FROM users WHERE username = ?',
+                    (username, ))
+        stored_password = cur.fetchall()[0][0]
+        db.close()
+        return stored_password == password
+
+    def write_resilts(self, username, tname, score):
+        current_time = time.clock()
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT ID FROM stats')
+        ids = [line[0] for line in cur.fetchall()]
+        if ids:
+            new_id = max(ids) + 1
+        else:
+            new_id = 0
+        cur.execute('INSERT INTO stats VALUES (?, ?, ?, ?, ?)',
+                    (new_id, current_time, tname, username, score))
+        db.commit()
+        cur.execute('SELECT tests_passed FROM users WHERE username = ?', (username, ))
+        old_tests_passed = cur.fetchall()[0][0]
+        if old_tests_passed is None:
+            tests_passed = str(new_id)
+        else:
+            tests_passed = old_tests_passed + ',' + str(new_id)
+        cur.execute('UPDATE users SET tests_passed = ?', (tests_passed, ))
+        db.commit()
+
 
 def count_score(form):
     results = []
@@ -81,15 +138,6 @@ def process_task_req(tname):
     return task, text, info, answers
 
 
-def check_username():
-    pass
-
-
-def add_user():
-    pass
-    
-
-
 db = TasksDB('tasks.db')
 app = Flask(__name__, static_folder=u"./static")
 
@@ -113,8 +161,41 @@ def main_guest():
     return render_template('main.html')
 
 
+@app.route('/logged_in', methods=['GET', 'POST'])
+def main_logged_in():
+    if request.form:
+        if 'language' in request.form\
+           and request.form['language'] != 'not chosen'\
+           and 'task' not in request.form:
+            lang = request.form['language']
+            session['lang'] = lang
+            test_data = db.get_tests(lang)
+            tests = [line[1] for line in test_data]
+            return render_template('main.html', chosen = True, 
+                                   tasks = tests)
+        elif 'task' in request.form:    
+            for el in request.form:
+                session[el] = request.form[el]
+            return redirect(url_for('testing_logged_in'))
+        else:
+            return render_template('main.html')
+    return render_template('main.html')
+
+
 @app.route('/testing', methods=['GET', 'POST'])
 def testing():
+    tname = session['task']
+    task, text, info, answers = process_task_req(tname)
+    if 'done' in request.form:
+        for el in request.form:
+            session[el] = request.form[el]
+        return redirect(url_for('results'))
+    return render_template('test.html', tname = tname, test = text,
+                           task = task, info = info)
+
+
+@app.route('/logged_in/testing', methods=['GET', 'POST'])
+def testing_logged_in():
     tname = session['task']
     task, text, info, answers = process_task_req(tname)
     if 'done' in request.form:
@@ -128,9 +209,11 @@ def testing():
 @app.route('/results', methods=['GET', 'POST'])
 def results():
     not_sents = ['action', 'language', 'task',  'csrfmiddlewaretoken',
-                 'lang', 'done']
+                 'lang', 'done', 'username', 'password']
     form = {el : session[el] for el in session if el not in not_sents}
     results, score, total = count_score(form)
+    if 'username' in session:
+        db.write_resilts(session['username'], session['task'], score)
     return render_template('results.html', results = results,
                            score = score)
 
@@ -142,14 +225,32 @@ def not_ready():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.form and 'login' in request.form\
+    if request.form and 'username' in request.form\
        and 'password' in request.form:
-       if not check_username(request.form['login']):
+       if db.username_exists(request.form['username']):
           return render_template('already_taken.html')
        else:
-          add_user(request.form['login'], request.form['password'])
-          redirect(main_guest) # исправить
-       
+          db.add_user(request.form['username'], request.form['password'])
+          session['username'] = request.form['username']
+          return redirect(url_for('main_guest'))
+    else:
+        return render_template('register.html')
+
+
+@app.route('/log_in', methods=['GET', 'POST'])
+def log_in():
+    if request.form and 'username' in request.form\
+       and 'password' in request.form:
+        if db.username_exists(request.form['username']):
+            if not db.check_password(request.form['username'], request.form['password']):
+                return render_template('log_in.html', error = 'DoesntFit')
+            else:
+                session['username'] = request.form['username']
+                return redirect(url_for('main_guest'))
+        else:
+            return render_template('log_in.html', error = 'NoSuchUsername')
+    else:
+        return render_template('log_in.html')
 
 
 if __name__ == '__main__':
