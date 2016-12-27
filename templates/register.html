@@ -47,7 +47,10 @@
           <b>password</b>
            <input type="text" name="password">
           <br>
-          <br/>
+          <br>
+          {% if error == 'AlreadyExists' %}
+          <p>Sorry, this username already esists!</p>
+          {% endif %}
           </td>
           </tr>
           <tr>

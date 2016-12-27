@@ -161,25 +161,25 @@ def main_guest():
     return render_template('main.html')
 
 
-@app.route('/logged_in', methods=['GET', 'POST'])
-def main_logged_in():
-    if request.form:
-        if 'language' in request.form\
-           and request.form['language'] != 'not chosen'\
-           and 'task' not in request.form:
-            lang = request.form['language']
-            session['lang'] = lang
-            test_data = db.get_tests(lang)
-            tests = [line[1] for line in test_data]
-            return render_template('main.html', chosen = True, 
-                                   tasks = tests)
-        elif 'task' in request.form:    
-            for el in request.form:
-                session[el] = request.form[el]
-            return redirect(url_for('testing_logged_in'))
-        else:
-            return render_template('main.html')
-    return render_template('main.html')
+# @app.route('/logged_in', methods=['GET', 'POST'])
+# def main_logged_in():
+#     if request.form:
+#         if 'language' in request.form\
+#            and request.form['language'] != 'not chosen'\
+#            and 'task' not in request.form:
+#             lang = request.form['language']
+#             session['lang'] = lang
+#             test_data = db.get_tests(lang)
+#             tests = [line[1] for line in test_data]
+#             return render_template('main.html', chosen = True, 
+#                                    tasks = tests)
+#         elif 'task' in request.form:    
+#             for el in request.form:
+#                 session[el] = request.form[el]
+#             return redirect(url_for('testing_logged_in'))
+#         else:
+#             return render_template('main.html')
+#     return render_template('main.html')
 
 
 @app.route('/testing', methods=['GET', 'POST'])
@@ -228,7 +228,7 @@ def register():
     if request.form and 'username' in request.form\
        and 'password' in request.form:
        if db.username_exists(request.form['username']):
-          return render_template('already_taken.html')
+          return render_template('register.html', error='AlreadyExists')
        else:
           db.add_user(request.form['username'], request.form['password'])
           session['username'] = request.form['username']
@@ -243,12 +243,12 @@ def log_in():
        and 'password' in request.form:
         if db.username_exists(request.form['username']):
             if not db.check_password(request.form['username'], request.form['password']):
-                return render_template('log_in.html', error = 'DoesntFit')
+                return render_template('log_in.html', error='DoesntFit')
             else:
                 session['username'] = request.form['username']
                 return redirect(url_for('main_guest'))
         else:
-            return render_template('log_in.html', error = 'NoSuchUsername')
+            return render_template('log_in.html', error='NoSuchUsername')
     else:
         return render_template('log_in.html')
 
