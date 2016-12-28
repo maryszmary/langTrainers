@@ -215,7 +215,7 @@ def results():
     if 'username' in session:
         db.write_resilts(session['username'], session['task'], score)
     return render_template('results.html', results = results,
-                           score = score)
+                           score = score, total = total)
 
 
 @app.route('/not_ready', methods=['GET', 'POST'])
