@@ -101,13 +101,8 @@ class TasksDB():
         cur.execute('INSERT INTO stats VALUES (?, ?, ?, ?, ?)',
                     (new_id, current_time, tname, username, score))
         db.commit()
-        cur.execute('SELECT tests_passed FROM users WHERE username = ?', (username, ))
-        old_tests_passed = cur.fetchall()[0][0]
-        if old_tests_passed is None:
-            tests_passed = str(new_id)
-        else:
-            tests_passed = old_tests_passed + ',' + str(new_id)
-        cur.execute('UPDATE users SET tests_passed = ?', (tests_passed, ))
+        cur.execute('UPDATE users SET tests_passed = tests_passed || "," || ?'
+                    'WHERE username = ? ', (str(new_id), username))
         db.commit()
 
 
@@ -159,27 +154,6 @@ def main_guest():
                 session[el] = request.form[el]
             return redirect(url_for('testing'))
     return render_template('main.html')
-
-
-# @app.route('/logged_in', methods=['GET', 'POST'])
-# def main_logged_in():
-#     if request.form:
-#         if 'language' in request.form\
-#            and request.form['language'] != 'not chosen'\
-#            and 'task' not in request.form:
-#             lang = request.form['language']
-#             session['lang'] = lang
-#             test_data = db.get_tests(lang)
-#             tests = [line[1] for line in test_data]
-#             return render_template('main.html', chosen = True, 
-#                                    tasks = tests)
-#         elif 'task' in request.form:    
-#             for el in request.form:
-#                 session[el] = request.form[el]
-#             return redirect(url_for('testing_logged_in'))
-#         else:
-#             return render_template('main.html')
-#     return render_template('main.html')
 
 
 @app.route('/testing', methods=['GET', 'POST'])
@@ -242,7 +216,8 @@ def log_in():
     if request.form and 'username' in request.form\
        and 'password' in request.form:
         if db.username_exists(request.form['username']):
-            if not db.check_password(request.form['username'], request.form['password']):
+            if not db.check_password(request.form['username'],
+                                     request.form['password']):
                 return render_template('log_in.html', error='DoesntFit')
             else:
                 session['username'] = request.form['username']
