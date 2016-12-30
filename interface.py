@@ -191,6 +191,13 @@ def results():
     return render_template('results.html', results = results,
                            score = score, total = total)
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'username' in session:
+        username = session['username']
+        return render_template('profile.html', username = username)
+    return redirect(url_for('not_ready'))
+
 
 @app.route('/not_ready', methods=['GET', 'POST'])
 def not_ready():
