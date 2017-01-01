@@ -104,6 +104,16 @@ class TasksDB():
         cur.execute('UPDATE users SET tests_passed = tests_passed || "," || ?'
                     'WHERE username = ? ', (str(new_id), username))
         db.commit()
+        db.close()
+
+    def get_stats(self, username):
+        db = sqlite3.connect(self.name)
+        cur = db.cursor()
+        cur.execute('SELECT * FROM stats WHERE user = ?', (username, ))
+        results = cur.fetchall()
+        db.commit()
+        db.close()
+        return results
 
 
 def count_score(form):
@@ -195,7 +205,9 @@ def results():
 def profile():
     if 'username' in session:
         username = session['username']
-        return render_template('profile.html', username = username)
+        results = db.get_stats(username)
+        return render_template('profile.html', username = username,
+                               results = results)
     return redirect(url_for('not_ready'))
 
 

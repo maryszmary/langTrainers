@@ -21,31 +21,35 @@
 
       <tbody>
         <tr>
-          <td>
-            </td>
-            <td>
-            </td>
-          </tr>
-          <tr> 
+          <b><td>
+            Test
           </td>
           <td>
-          <br/>
-          {% for el in results %}
-          {% if el[1] %}
-          {{el[0]}}. {{el[2]}}: Correct!<br>
-          {% else %}
-          {{el[0]}}. {{el[2]}}: Incorrect; correct answer: {{el[3]}} <br>
-          {% endif %}
-          {% endfor %}
-          <br>
-          <br>
+            Score
           </td>
+          <td>
+            Time
+          </td></b>
           </tr>
+          <br><br><br><br>
+          {% for line in results %}
           <tr>
-        <td>
-        </td>
-        </tr>          
-
+          <td>
+          {{line[2]}}
+          </td>
+          <td>
+          {{line[-1]}}          
+          </td>
+          <td>
+          {{line[1]}}
+          </td>
+          </tr>
+          <br><br>
+          <tr>
+          <td>
+          </td>
+          </tr>          
+          {% endfor %}
       </tbody>
 
     </table>
